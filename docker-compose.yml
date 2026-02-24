@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: ${PROJECT_NAME}_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${PROJECT_NAME}_redis
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  app:
+    image: zallarx/laravel-app:latest
+    container_name: ${PROJECT_NAME}_app
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: laravel
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - ./laravel:/var/www/html   # для разработки (можно закомментировать в проде)
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: zallarx/nginx-custom:latest
+    container_name: ${PROJECT_NAME}_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT}:80"
+      - "${NGINX_HTTPS_PORT}:443"
+    volumes:
+      - ${SSL_CERT_PATH}:/etc/ssl:ro
+      - ./laravel:/var/www/html   # синхронизация для отдачи статики (если нужно)
+    networks:
+      - app-network
+    depends_on:
+      - app
+
+  node:
+    image: zallarx/node-app:latest
+    container_name: ${PROJECT_NAME}_node
+    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PORT: 3000
+    ports:
+      - "${NODE_PORT}:3000"
+    networks:
+      - app-network
+    depends_on:
+      - redis
+      - nginx
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:

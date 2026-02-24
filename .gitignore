@@ -1,0 +1,30 @@
+# Секреты и конфигурация
+.env
+.env.*
+*.env
+laravel/.env
+node/.env
+ssl/
+*.crt
+*.key
+*.pem
+*.p12
+
+# Файлы с паролями/ключами (если есть)
+config/database.php   # если в нём прописаны реальные пароли (обычно там только имена, но на всякий случай)
+docker-compose.override.yml   # если используете
+
+# Логи и временные файлы
+*.log
+storage/logs/*
+!storage/logs/.gitignore
+
+# Зависимости (не должны быть в репозитории)
+laravel/vendor/
+node/node_modules/
+
+# IDE и системные файлы
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
