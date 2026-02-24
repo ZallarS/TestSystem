@@ -63,9 +63,9 @@ services:
     container_name: ${PROJECT_NAME}_node
     restart: unless-stopped
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_URL: redis://redis:6379   # полный URL
       PORT: 3000
+      # REDIS_HOST и REDIS_PORT больше не нужны, если код использует REDIS_URL
     ports:
       - "${NODE_PORT}:3000"
     networks:
