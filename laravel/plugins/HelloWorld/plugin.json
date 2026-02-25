@@ -1,0 +1,10 @@
+{
+    "name": "HelloWorld",
+    "provider": "Plugins\\HelloWorld\\Providers\\HelloWorldServiceProvider",
+    "description": "Пример плагина, выводящего приветствие",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "requires": [
+    ],
+    "settings": []
+}
